@@ -1,8 +1,15 @@
 import streamlit as st
 import pandas as pd
 
-st.title('My first app')
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
-label = pd.DataFrame({"colonna 1": [1, 2, 3, 4], "colonna 2": [10, 20, 30, 40]})
-st.table(label)
-st.dataframe(label)
+
+# Use the application default credentials
+if not firebase_admin._apps:
+    cred = credentials.Certificate('casestudy-firebase.json')
+    firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+print("Firebase Initialized")
