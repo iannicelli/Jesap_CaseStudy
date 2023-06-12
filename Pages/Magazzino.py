@@ -10,7 +10,7 @@ from functions import add_product, load_data
 
 
 if not firebase_admin._apps:
-    cred = credentials.Certificate('casestudy-firebase.json')
+    cred = credentials.Certificate('reneud-80109-firebase-adminsdk-qvjw8-a1a4d6315a.json')
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -59,19 +59,19 @@ if choice == 'Inserisci prodotto':
             
             data = {
                 'ID': next_id,
-                'Nome prodotto': new_name,
+                'Nomeprodotto': new_name,
                 'Descrizione': new_description,
                 'Prezzo': new_price,
                 'Categoria': new_category,
-                'ID Marchio': new_brand_id,
+                'IDMarchio': new_brand_id,
             }
             db.collection('Prodotti').add(data)
 
             # Inserisco nel magazzino il nuovo prodotto con id e quantità
             magazzino_ref = db.collection('Magazzino')
             nuovo_documento = {
-                'ID Prodotto': next_id,
-                'Quantità': 1
+                'IDProdotto': next_id,
+                'Quantity': 1
             }
             magazzino_ref.add(nuovo_documento)
 
@@ -247,18 +247,84 @@ elif choice == 'Registra vendita':
                         st.write(data_vendita)
                         db.collection('Vendite').add(data_vendita)
 
+                        st.write("ORA AGGIORNO IL MAGAZZINO")
+
                         # Aggiorna la quantità del prodotto nel magazzino
                         magazzino_ref = db.collection('Magazzino')
+                        st.write(magazzino_ref)
                         query5 = magazzino_ref.where('IDProdotto', '==', new_product)
                         prodotti = query5.get()
+                        st.write(prodotti)
+                        if(prodotti == None):
+                            st.write("lista vuota")
                         for prodotto in prodotti:
+                            if(prodotti == None):
+                                st.write("Prodotto non trovato")
+                            else:
+                                st.write(prodotto)
                             prodotto_data = prodotto.to_dict()
                             prodotto_id = prodotto.id
                             prodotto_quantità = prodotto_data['Quantity']
 
+                            st.write(prodotto_quantità)
+                            st.write(new_quantity)
+
                             magazzino_ref.document(str(prodotto_id)).update({'Quantity': prodotto_quantità - new_quantity})
 
                         st.success("Vendita aggiunta con successo!")
+
+elif choice == 'Elimina prodotto':
+    new_category = st.selectbox("Categoria", ("", "Abbigliamento", "Abiti", "Accessori", "Accessori moda", "Audio portatile", "Bluse", "Camicie", "Cappotti", "Cardigan", "Felpe", "Giacche", "Giacche invernali", "Giubbotti", "Gonne", "Jeans", "Leggings", "Maglietta", "Pantaloni", "Maglioni", "Piumini", "Scarpe", "Scarpe sportive", "T-shirt", "Top", "Tute", "Vestiti", "altro"))
+    prodotti_ref = db.collection('Prodotti')
+    query = prodotti_ref.where('Categoria', '==', new_category)
+    prodotti = query.get()
+
+    prodotti_array = [""]
+    for prodotto in prodotti:
+        prodotto_data = prodotto.to_dict()
+        prodotti_array.append(prodotto_data['Nomeprodotto'])
+
+
+    if new_category:
+        new_product = st.selectbox("Seleziona il prodotto", prodotti_array)
+        query_desc = prodotti_ref.where('Nomeprodotto', '==', new_product)
+        nomi = query_desc.get()
+
+        descr_array = [""]
+        for nome in nomi:
+            nome_data = nome.to_dict()
+            descr_array.append(nome_data['Descrizione'])
+
+        if new_product:
+            new_description = st.selectbox("Seleziona la descrizione", descr_array)
+            new_quantity = st.number_input("Quantità", min_value=1, value=1)
+
+            if st.button("Aggiungi prodotto"):
+                if new_description.strip() == '':
+                    st.warning('⚠️ Selezionare una descrizione valida')
+                else:
+                    query1 = prodotti_ref.where('Descrizione', '==', new_description.strip()).where('Nomeprodotto', '==', new_product)
+                    prodotti = query1.get()
+                    for prodotto in prodotti:
+                        prodotto_data = prodotto.to_dict()
+                        prodotto_id = prodotto_data['ID']
+
+
+
+                    magazzino_ref = db.collection('Magazzino')
+                    query2 = magazzino_ref.where('IDProdotto', '==', prodotto_id)
+                    prodotti = query2.get()
+                    for prodotto in prodotti:
+                        prodotto_data = prodotto.to_dict()
+                        prodotto_id = prodotto.id
+                        prodotto_quantità = prodotto_data['Quantity']
+
+                        magazzino_ref.document(str(prodotto_id)).update({'Quantity': prodotto_quantità - new_quantity})
+
+                    st.success("Prodotti eliminati con successo!")
+
+
+
 
 
 
