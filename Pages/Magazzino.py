@@ -9,6 +9,7 @@ from functions import add_product, load_data
 
 
 
+
 if not firebase_admin._apps:
     cred = credentials.Certificate('reneud-80109-firebase-adminsdk-qvjw8-a1a4d6315a.json')
     firebase_admin.initialize_app(cred)
@@ -172,7 +173,7 @@ elif choice == 'Registra vendita':
             data1.append([
                 new_user,
                 user_data['Nome'],
-                user_data['Città'],
+                user_data['City'],
                 user_data['E-mail']
             ])
 
@@ -198,7 +199,7 @@ elif choice == 'Registra vendita':
                 data2.append([
                     new_shop,
                     shop_data['NomeNegozio'],
-                    shop_data['Città'],
+                    shop_data['City'],
                     shop_data['Indirizzo']
                 ])
 
@@ -242,7 +243,7 @@ elif choice == 'Registra vendita':
                             'IDnegozio': new_shop,
                             'IDprodotto': new_product,
                             'IDutente': new_user,
-                            'Quantità': new_quantity,
+                            'Quantity': new_quantity,
                         }
                         st.write(data_vendita)
                         db.collection('Vendite').add(data_vendita)
@@ -252,10 +253,11 @@ elif choice == 'Registra vendita':
                         # Aggiorna la quantità del prodotto nel magazzino
                         magazzino_ref = db.collection('Magazzino')
                         st.write(magazzino_ref)
+                        st.write(new_product)
                         query5 = magazzino_ref.where('IDProdotto', '==', new_product)
                         prodotti = query5.get()
                         st.write(prodotti)
-                        if(prodotti == None):
+                        if(prodotti == []):
                             st.write("lista vuota")
                         for prodotto in prodotti:
                             if(prodotti == None):

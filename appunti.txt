@@ -1,0 +1,20 @@
+
+def search_products():
+    category = category_input.text_input("Categoria")
+    price = price_input.text_input("Prezzo")
+
+    products_ref = db.reference("Prodotti")
+    products = products_ref.get()
+
+    table.empty()
+
+    for key, product in products.items():
+        if (not category or product.get("Categoria") == category) and (not price or float(product.get("Prezzo", 0)) <= float(price)):
+            table.write(f"{key}: {product.get('Nomeprodotto')} - {product.get('Prezzo')}")
+
+category_input = st.empty()
+price_input = st.empty()
+
+search_button = st.button("Search", on_click=search_products)
+
+table = st.empty()
