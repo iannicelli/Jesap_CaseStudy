@@ -245,33 +245,23 @@ elif choice == 'Registra vendita':
                             'IDutente': new_user,
                             'Quantity': new_quantity,
                         }
-                        st.write(data_vendita)
                         db.collection('Vendite').add(data_vendita)
-
-                        st.write("ORA AGGIORNO IL MAGAZZINO")
 
                         # Aggiorna la quantità del prodotto nel magazzino
                         magazzino_ref = db.collection('Magazzino')
-                        st.write(magazzino_ref)
-                        st.write(new_product)
+ 
                         query5 = magazzino_ref.where('IDProdotto', '==', new_product)
                         prodotti = query5.get()
-                        st.write(prodotti)
-                        if(prodotti == []):
-                            st.write("lista vuota")
-                        for prodotto in prodotti:
-                            if(prodotti == None):
-                                st.write("Prodotto non trovato")
-                            else:
-                                st.write(prodotto)
-                            prodotto_data = prodotto.to_dict()
-                            prodotto_id = prodotto.id
-                            prodotto_quantità = prodotto_data['Quantity']
+     
+                        if(prodotti == None):
+                            st.write("Prodotto non trovato")
+                        else:
+                            for prodotto in prodotti:
+                                prodotto_data = prodotto.to_dict()
+                                prodotto_id = prodotto.id
+                                prodotto_quantità = prodotto_data['Quantity']
 
-                            st.write(prodotto_quantità)
-                            st.write(new_quantity)
-
-                            magazzino_ref.document(str(prodotto_id)).update({'Quantity': prodotto_quantità - new_quantity})
+                                magazzino_ref.document(str(prodotto_id)).update({'Quantity': prodotto_quantità - new_quantity})
 
                         st.success("Vendita aggiunta con successo!")
 
@@ -301,7 +291,7 @@ elif choice == 'Elimina prodotto':
             new_description = st.selectbox("Seleziona la descrizione", descr_array)
             new_quantity = st.number_input("Quantità", min_value=1, value=1)
 
-            if st.button("Aggiungi prodotto"):
+            if st.button("Elimina prodotto"):
                 if new_description.strip() == '':
                     st.warning('⚠️ Selezionare una descrizione valida')
                 else:

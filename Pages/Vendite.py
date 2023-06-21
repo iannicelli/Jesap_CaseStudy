@@ -216,6 +216,6 @@ else:
         df = pd.DataFrame(filtered_data, columns=headers)
         st.table(df)
     else:
-        st.warning("Nessun prodotto corrisponde ai criteri di ricerca.")
+        st.warning("Nessuna vendita corrisponde ai criteri di ricerca.")
 
 
